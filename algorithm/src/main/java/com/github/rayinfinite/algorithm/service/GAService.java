@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -24,8 +25,9 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 public class GAService {
-    private List<ClashData> clashInfos = new ArrayList<>();
-    private List<RoomUtilization> roomUtilization = new ArrayList<>();
+    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/M/d");
+    private final List<ClashData> clashInfos = new ArrayList<>();
+    private final List<RoomUtilization> roomUtilization = new ArrayList<>();
     private List<Registration> registrations = new ArrayList<>();
 
     public List<Course> gap(List<Course> courseList, List<Cohort> cohortList, List<Timeslot> timeslotList,
@@ -133,7 +135,8 @@ public class GAService {
             int i = 0;
             for (TeachingPlan plan : clashPlans) {
                 String roomName = timetable.getRoom(plan.getRoomId()).getName();
-                String date = timetable.getTimeslot(plan.getTimeslotId()).getDate().toString();
+                Date dateTime = timetable.getTimeslot(plan.getTimeslotId()).getDate();
+                String date = formatter.format(dateTime);
                 if (i == 0) {
                     clashInfos.add(new ClashData(clashType, clashPlans.size(), roomName, date));
                     i++;
@@ -171,7 +174,7 @@ public class GAService {
 
     private Course convertToCourse(OutputData data) {
         Course course = new Course();
-        BeanUtils.copyProperties(course, data);
+        BeanUtils.copyProperties(data, course);
         return course;
     }
 
@@ -311,14 +314,15 @@ public class GAService {
             // 打印每个冲突的详细信息
             for (TeachingPlan plan : clashPlans) {
                 String roomName = timetable.getRoom(plan.getRoomId()).getName();
-                String Date = timetable.getTimeslot(plan.getTimeslotId()).getDate().toString();
+                Date dateTime = timetable.getTimeslot(plan.getTimeslotId()).getDate();
+                String date = formatter.format(dateTime);
 //                log.info("Clash at Room: {}, Date: {}",
 //                        roomName, Date);
                 if (i == 0) {
-                    clashInfos.add(new ClashData(clashType, clashPlans.size(), roomName, Date));
+                    clashInfos.add(new ClashData(clashType, clashPlans.size(), roomName, date));
                     i++;
                 } else {
-                    clashInfos.add(new ClashData(clashType, null, roomName, Date));
+                    clashInfos.add(new ClashData(clashType, null, roomName, date));
                 }
             }
         }
@@ -374,8 +378,8 @@ public class GAService {
             List<Integer> sortedCohorts = cohortGroup.keySet().stream()
                     .sorted((cohort1, cohort2) -> {
                         // 按 cohort 的第一门课的日期排序
-                        Date date1 = cohortGroup.get(cohort1).get(0).getCourseDate();
-                        Date date2 = cohortGroup.get(cohort2).get(0).getCourseDate();
+                        Date date1 = cohortGroup.get(cohort1).getFirst().getCourseDate();
+                        Date date2 = cohortGroup.get(cohort2).getFirst().getCourseDate();
                         return date1.compareTo(date2);
                     })
                     .toList();

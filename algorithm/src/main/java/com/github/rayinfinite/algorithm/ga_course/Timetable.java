@@ -6,7 +6,6 @@ import com.github.rayinfinite.algorithm.utils.PublicHoliday;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.security.SecureRandom;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -15,19 +14,16 @@ import java.util.*;
 @Slf4j
 @Getter
 public class Timetable {
-    private final SecureRandom secureRandom = new SecureRandom();
     private final Map<Integer, Classroom> rooms;
     private final Map<Integer, Course> courses;
     private final Map<Integer, Cohort> cohorts;
     private final Map<Integer, Timeslot> timeslots;
     private final Map<Integer, Professor> professors;
-
+    private final Random random = new Random();
     private TeachingPlan[] plans;
-
     private int plansNum = 0;
 
     //浅拷贝，用于适应度计算
-    @SuppressWarnings("CopyConstructorMissesField")
     public Timetable(Timetable cloneable) {
         this.rooms = cloneable.getRooms();
         this.courses = cloneable.getCourses();
@@ -122,7 +118,6 @@ public class Timetable {
         this.plans = plans;
     }
 
-
     public List<Course> getCoursesByCohortId(int cohortId) {
         List<Course> cohortCourses = new ArrayList<>();
         for (Course course : this.courses.values()) {
@@ -150,7 +145,7 @@ public class Timetable {
 
     public Classroom getRandomRoom() {
         Object[] roomsArray = this.rooms.values().toArray();
-        return (Classroom) roomsArray[(int) (roomsArray.length * Math.random())];
+        return (Classroom) roomsArray[(random.nextInt(roomsArray.length))];
     }
 
     public Course getCourse(int courseId) {
@@ -277,7 +272,6 @@ public class Timetable {
 
         return clashCategories;
     }
-
 
     public int calcPenalty() {
         int penalty = 0;
@@ -408,9 +402,8 @@ public class Timetable {
                     return dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY; // 过滤工作日
                 })
                 .toList();
-        return weekdaySlots.get(secureRandom.nextInt(weekdaySlots.size()));
+        return weekdaySlots.get(random.nextInt(weekdaySlots.size()));
     }
-
 
     public Timeslot getRandomFridaySaturdayTimeslot() {
         List<Timeslot> fridaySaturdaySlots = this.timeslots.values().stream()
@@ -420,13 +413,11 @@ public class Timetable {
                     return dayOfWeek == DayOfWeek.FRIDAY || dayOfWeek == DayOfWeek.SATURDAY; // 过滤周五和周六
                 })
                 .toList();
-        return fridaySaturdaySlots.get(secureRandom.nextInt(fridaySaturdaySlots.size()));
+        return fridaySaturdaySlots.get(random.nextInt(fridaySaturdaySlots.size()));
     }
 
     public void setPlans(TeachingPlan[] plans) {
         this.plans = plans;
         this.plansNum = plans.length;
     }
-
-
 }

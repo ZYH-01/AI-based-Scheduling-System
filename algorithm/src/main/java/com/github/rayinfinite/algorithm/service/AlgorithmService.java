@@ -99,7 +99,7 @@ public class AlgorithmService {
         int i = 1;
         for (OutputData output : result) {
             Course course = new Course();
-            BeanUtils.copyProperties(course, output);
+            BeanUtils.copyProperties(output, course);
             course.setId(i++);
             courseList.add(course);
         }

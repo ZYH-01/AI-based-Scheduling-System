@@ -9,9 +9,11 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 public class Individual {
+    private final Random random = new Random();
     private int[] chromosome;
     @Setter
     private double fitness = -1;
@@ -19,14 +21,13 @@ public class Individual {
     public Individual(int chromosomeLength) {
         this.chromosome = new int[chromosomeLength];
         for (int gene = 0; gene < chromosomeLength; gene++) {
-            if (0.5 < Math.random()) {
+            if (0.5 < random.nextDouble()) {
                 this.setGene(gene, 1);
             } else {
                 this.setGene(gene, 0);
             }
         }
     }
-
 
     public Individual(Timetable timetable) {
         int plansNum = timetable.getPlansNum(timetable);
