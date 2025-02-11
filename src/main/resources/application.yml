@@ -25,7 +25,7 @@ spring:
         token-uri: https://login.microsoftonline.com/common/oauth2/v2.0/token
         jwk-set-uri: https://login.microsoftonline.com/common/discovery/v2.0/keys
         user-info-uri: https://graph.microsoft.com/oidc/userinfo
-        user-name-attribute: name
+        user-name-attribute: sub
     registration:
       azure:
         provider: azure

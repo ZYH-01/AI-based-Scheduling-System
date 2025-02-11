@@ -54,10 +54,11 @@ public class LoginUtil {
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setName(username);
-            newUser.setActive(true);
+            newUser.setActive(false);
             newUser.setCreated(new Date());
             newUser.setLastLogin(new Date());
             userRepository.save(newUser);
+            throw new BusinessException("User not found");
         });
     }
 }
