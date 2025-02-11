@@ -9,6 +9,7 @@ import com.github.rayinfinite.algorithm.entity.*;
 import com.github.rayinfinite.algorithm.excel.BaseExcelReader;
 import com.github.rayinfinite.algorithm.repository.CourseRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +34,8 @@ public class AlgorithmService {
     private final GAService gaService;
     private final Lock lock = new ReentrantLock();
     private final StringRedisTemplate redisTemplate;
+    @Getter
+    private boolean taskRunning = false;
 
     public void evictCaches() {
         // 定义要清除的缓存前缀列表
@@ -64,8 +67,14 @@ public class AlgorithmService {
         }
         lock.unlock();
 
-        Thread.ofVirtual().start(() -> gap(courseReader.getDataList(), cohortReader.getDataList(),
-                timeReader.getDataList()));
+        Thread.ofVirtual().start(() -> {
+            try {
+                taskRunning = true;
+                gap(courseReader.getDataList(), cohortReader.getDataList(), timeReader.getDataList());
+            } finally {
+                taskRunning = false;
+            }
+        });
         return "success";
     }
 
@@ -88,7 +97,14 @@ public class AlgorithmService {
         gaService.updateRegistrations(registrationReader.getDataList());
         lock.unlock();
 
-        Thread.ofVirtual().start(() -> detection(outputDataReader.getDataList()));
+        Thread.ofVirtual().start(() -> {
+            try {
+                taskRunning = true;
+                detection(outputDataReader.getDataList());
+            } finally {
+                taskRunning = false;
+            }
+        });
         return "success";
     }
 
