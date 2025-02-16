@@ -65,7 +65,7 @@ const UploadPage: React.FC = () => {
       setIsRunning(data.running);
     };
 
-    return () => eventSource.close(); // 组件卸载时关闭连接
+    return () => eventSource.close(); // Close connection when component is uninstalled
   }, []);
 
   const handleAddRow = () => {

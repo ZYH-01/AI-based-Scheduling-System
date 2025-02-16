@@ -45,7 +45,7 @@ public class AlgorithmController {
 
     @GetMapping(value = "/upload/status", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Map<String, Boolean>> streamTaskStatus() {
-        return Flux.interval(Duration.ofSeconds(1)) // 每秒推送一次状态
+        return Flux.interval(Duration.ofSeconds(1)) // Push status every second
                 .map(sequence -> {
                     Map<String, Boolean> status = new HashMap<>();
                     status.put("running", service.isTaskRunning());
