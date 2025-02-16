@@ -38,11 +38,11 @@ public class AlgorithmService {
     private boolean taskRunning = false;
 
     public void evictCaches() {
-        // 定义要清除的缓存前缀列表
+        // Define the list of cache prefixes to be cleared
         String[] cacheNames = {"course", "teacher", "cohort"};
 
         for (String cacheName : cacheNames) {
-            // 使用keys命令匹配所有以cacheName为前缀的key，并删除它们
+            // Use the keys command to match all keys prefixed with cacheName and remove them
             Set<String> keys = redisTemplate.keys(cacheName + "*");
             if (keys != null && !keys.isEmpty()) {
                 redisTemplate.delete(keys);
@@ -153,23 +153,23 @@ public class AlgorithmService {
 
         ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).build();
 
-        // 写入第一个 Sheet - 课程信息
+        // Write First Sheet - Course Information
         WriteSheet courseSheet = EasyExcel.writerSheet(0, "Course").head(OutputData.class).build();
         excelWriter.write(outputDataList, courseSheet);
 
-        // 写入第二个 Sheet - 冲突报告
+        // Write to Second Sheet - Conflict Report
         WriteSheet clashSheet = EasyExcel.writerSheet(1, "Clash").head(ClashData.class).build();
         excelWriter.write(clashInfos, clashSheet);
 
-        // 写入第三个 Sheet - 教室利用率
+        // Write to Third Sheet - Classroom Utilisation
         WriteSheet roomUtilizationSheet = EasyExcel.writerSheet(2, "Utilization").head(RoomUtilization.class).build();
         excelWriter.write(roomUtilizations, roomUtilizationSheet);
 
-        // 写入第四个 Sheet - 注册
+        // Write to 4th Sheet - Register
         WriteSheet registrationSheet = EasyExcel.writerSheet(3, "Registration").head(Registration.class).build();
         excelWriter.write(registrations, registrationSheet);
 
-        // 关闭 ExcelWriter
+        // Close ExcelWriter
         excelWriter.finish();
     }
 }
